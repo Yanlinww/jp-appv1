@@ -733,6 +733,87 @@ body {
   font-size: 0.8rem;
 }
 
+/* --- 選擇題測驗樣式 --- */
+.mc-card {
+  flex: 0 0 auto; /* 不要自動伸縮 */
+  margin-bottom: 20px;
+  padding: 30px 20px;
+}
+
+.quiz-question-type {
+  font-size: 0.85rem;
+  color: #adb5bd;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.wrong-feedback {
+  margin-top: 15px;
+  background: #fff5f5;
+  color: #fa5252;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  animation: fadeIn 0.3s;
+}
+
+/* 選項按鈕格線 (2x2) */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex: 1; /* 佔滿下方空間 */
+  padding-bottom: 20px;
+}
+
+.option-btn {
+  background: white;
+  border: 2px solid #f1f3f5;
+  border-radius: 16px;
+  padding: 16px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.option-btn:active {
+  transform: scale(0.96);
+}
+
+.opt-reading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #5c7cfa;
+  margin-bottom: 4px;
+}
+
+.opt-meaning {
+  font-size: 0.9rem;
+  color: #868e96;
+}
+
+/* 答對答錯樣式 */
+.option-btn.correct {
+  background: #ebfbee;
+  border-color: #51cf66;
+}
+
+.option-btn.wrong {
+  background: #fff5f5;
+  border-color: #ff6b6b;
+  opacity: 0.7;
+}
+
+.option-btn.muted {
+  opacity: 0.4;
+  border-color: #f1f3f5;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
