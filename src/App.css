@@ -1,0 +1,739 @@
+/* src/App.css */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Nunito:wght@400;700&display=swap');
+
+:root {
+  /* 🎨 配色盤：清爽日系風格 */
+  --primary: #5c7cfa;       /* 主色：矢車菊藍 */
+  --primary-dark: #4263eb;
+  --secondary: #ff922b;     /* 輔助色：溫暖橘 (用於收藏) */
+  --success: #51cf66;       /* 成功：薄荷綠 */
+  --danger: #ff6b6b;        /* 失敗/退出：柔和紅 */
+  --bg-color: #f8f9fa;      /* 背景：極淺灰 */
+  --card-bg: #ffffff;
+  --text-main: #343a40;
+  --text-light: #868e96;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --radius: 16px;           /* 圓角統一 */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  font-family: 'Nunito', 'Noto Sans JP', sans-serif; /* 支援日文字型 */
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 手機版面容器 */
+.app-container {
+  width: 100%;
+  max-width: 520px;        /* ✨ 改寬一點，讓字不會換行 */
+  height: 90vh;            /* ✨ 設定高度為畫面的 90% */
+  max-height: 850px;       /* 不要太高 */
+  background: #ffffff;
+  position: relative;
+  
+  /* ✨ 像 iPhone 的圓角 */
+  border-radius: 36px;     
+  
+  /* ✨ 深邃的陰影，製造懸浮感 */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 
+              0 0 0 12px rgba(255, 255, 255, 0.4); /* 外圈光暈 */
+  
+  /* 內部滾動設定 (重要) */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 針對真正的手機 (螢幕小於 600px) 還原成滿版 */
+@media (max-width: 600px) {
+  body {
+    background: #ffffff;
+    align-items: flex-start; /* 手機上靠上對齊 */
+  }
+  
+  .app-container {
+    max-width: 100%;
+    height: 100vh;         /* 手機上佔滿高度 */
+    max-height: none;
+    border-radius: 0;      /* 手機上不用圓角 */
+    box-shadow: none;
+  }
+}
+
+/* 通用按鈕樣式 */
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(92, 124, 250, 0.3); }
+.btn-secondary { background: var(--secondary); color: white; box-shadow: 0 4px 10px rgba(255, 146, 43, 0.3); }
+.btn-success { background: var(--success); color: white; box-shadow: 0 4px 10px rgba(81, 207, 102, 0.3); }
+.btn-danger { background: var(--danger); color: white; }
+.btn-ghost { background: transparent; color: var(--text-light); }
+.btn-outline { background: white; border: 2px solid #e9ecef; color: var(--text-light); }
+
+/* --- 首頁 (Home) --- */
+.home-screen {
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 90vh;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.app-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.app-subtitle {
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+.menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.menu-card {
+  background: white;
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  border: 1px solid transparent;
+  transition: transform 0.2s;
+}
+
+.menu-card:active { transform: scale(0.98); }
+
+.icon-box {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* --- 列表頁 (List) --- */
+
+.list-screen {
+  padding: 0;
+  background: white;
+  height: 100%;       /* 關鍵：填滿卡片高度 */
+  display: flex;      /* 使用 Flex 排版 */
+  flex-direction: column; /* 上下排列 */
+  overflow: hidden;   /* 防止整個頁面捲動 */
+}
+
+.sticky-header {
+  /* 因為使用了 Flex，這裡不需要 position: sticky 了 */
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f3f5;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  flex-shrink: 0; /* 關鍵：讓標題不會被壓縮 */
+}
+
+/* ... 搜尋框樣式不用動 ... */
+
+.word-list {
+  flex: 1;            /* 關鍵：佔用剩餘的所有空間 */
+  overflow-y: auto;   /* 關鍵：只有這裡可以垂直捲動 */
+  padding: 0 20px 40px 20px;
+  
+  /* 讓 iOS 捲動更順暢 */
+  -webkit-overflow-scrolling: touch; 
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f1f3f5;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box; /* 重要 */
+  transition: background 0.2s;
+}
+
+.search-input:focus { background: #e9ecef; }
+
+.word-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.star-btn {
+  background: none; border: none;
+  font-size: 1.5rem;
+  color: #dee2e6;
+  padding: 8px;
+  margin-right: 12px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star-btn.active { color: var(--secondary); transform: scale(1.1); }
+
+.word-info { flex: 1; }
+.word-main { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+.word-sub { display: flex; gap: 8px; font-size: 0.9rem; color: var(--text-light); }
+.reading { color: var(--primary); font-weight: 500; }
+
+/* --- 測驗頁 (Quiz) --- */
+.quiz-screen {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;          /* 佔滿容器 */
+  box-sizing: border-box;
+}
+
+/* 讓單字卡片可以自動伸縮 */
+.flash-card {
+  flex: 1;               /* 自動佔滿剩餘空間 */
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* 卡片自己的陰影 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;        /* 上下留白 */
+  border: 1px solid #f0f0f0;
+}
+
+/* 優化「退出」按鈕 */
+.btn-ghost {
+  background: rgba(0,0,0,0.05); /* 淡淡的灰色背景 */
+  color: #666;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px; /* 膠囊狀 */
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-ghost:hover {
+  background: rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.progress-container {
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+
+.flash-card {
+  flex: 1;
+  background: white;
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+  border: 1px solid #f1f3f5;
+}
+
+.quiz-word {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 20px;
+}
+
+.answer-box {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 16px;
+  width: 80%;
+  animation: fadeIn 0.3s ease;
+}
+
+.answer-reading { color: var(--primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
+.answer-meaning { color: var(--text-light); font-size: 1rem; }
+
+.quiz-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.result-screen {
+  text-align: center;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+.score-circle {
+  width: 150px; height: 150px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30px auto;
+  border: 4px solid var(--primary);
+}
+
+.score-number { font-size: 3.5rem; font-weight: 800; color: var(--primary); line-height: 1; }
+.score-label { font-size: 0.9rem; color: var(--text-light); margin-top: 5px; }
+
+/* --- 新增：首頁大型動態圖示 --- */
+.hero-icon {
+  font-size: 5rem; /* 超大圖示 */
+  margin-bottom: 10px;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+  animation: float 3s ease-in-out infinite; /* 浮動動畫 */
+}
+
+/* 讓圖示上下漂浮 */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+/* --- 修改：測驗卡片 (為了放星星) --- */
+.flash-card {
+  position: relative; /* 關鍵：讓星星可以絕對定位 */
+  /* 其他保持不變，這裡重複寫是為了確保你不用找半天 */
+  flex: 1;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  border: 1px solid #f0f0f0;
+}
+
+/* --- 新增：測驗頁的星星按鈕 --- */
+.quiz-star-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #e9ecef; /* 預設淺灰 */
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.quiz-star-btn.active {
+  color: #ff922b; /* 收藏時變橘色 */
+  transform: scale(1.1);
+  filter: drop-shadow(0 2px 4px rgba(255, 146, 43, 0.3));
+}
+
+/* src/App.css 新增 */
+
+/* 詞性標籤樣式 */
+.pos-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #4dabf7;       /* 亮藍色文字 */
+  background: #e7f5ff;  /* 淺藍色背景 */
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-right: 8px;    /* 跟旁邊的文字保持距離 */
+  vertical-align: middle;
+}
+
+/* 測驗答案裡的詞性標籤 */
+.answer-pos {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: #868e96;
+  background: #f1f3f5;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+/* --- 詳細頁 (Detail) --- */
+.detail-screen {
+  padding: 20px;
+  background: #f8f9fa;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.active-star { color: #ff922b; }
+
+.detail-card {
+  background: white;
+  padding: 40px 20px;
+  border-radius: 24px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+  position: relative;
+  border: 1px solid #fff;
+}
+
+.detail-pos {
+  display: inline-block;
+  background: #e7f5ff;
+  color: #5c7cfa;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.detail-word {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #343a40;
+  margin-bottom: 8px;
+}
+
+.detail-reading {
+  font-size: 1.5rem;
+  color: #5c7cfa;
+  font-weight: 500;
+}
+
+.info-block {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #868e96;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-content {
+  font-size: 1.1rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+.info-content.empty {
+  color: #adb5bd;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* --- 詳細頁底部導覽 --- */
+.detail-footer {
+  margin-top: 20px;
+  background: white;
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky; /* 如果內容太長，它會黏在底部 */
+  bottom: 0;
+}
+
+.nav-btn {
+  background: #f1f3f5;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  color: #495057;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 100px;
+}
+
+.nav-btn:active {
+  transform: scale(0.95);
+  background: #e9ecef;
+}
+
+/* 當按鈕不能按的時候 (第一頁/最後一頁) */
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.nav-counter {
+  font-size: 0.9rem;
+  color: #adb5bd;
+  font-weight: 600;
+}
+
+/* src/App.css 新增 */
+
+/* 例句區塊樣式 */
+.sentence-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sentence-jp {
+  font-size: 1.2rem;
+  color: #343a40;
+  font-weight: 500;
+  line-height: 1.6;
+  border-left: 4px solid #5c7cfa; /* 左邊加一條藍線裝飾 */
+  padding-left: 12px;
+}
+
+.sentence-cn {
+  font-size: 1rem;
+  color: #868e96;
+}
+
+/* --- 排序切換按鈕區 --- */
+.sort-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sort-pill {
+  background: #f1f3f5;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  color: #868e96;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 700;
+}
+
+.sort-pill:hover {
+  background: #e9ecef;
+}
+
+.sort-pill.active {
+  background: #5c7cfa;
+  color: white;
+  box-shadow: 0 2px 6px rgba(92, 124, 250, 0.3);
+}
+
+/* --- 篩選控制區 --- */
+.control-row {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  gap: 12px;
+}
+
+.control-label {
+  font-size: 0.8rem;
+  color: #adb5bd;
+  font-weight: 700;
+  white-space: nowrap; /* 不換行 */
+}
+
+.control-group {
+  display: flex;
+  gap: 8px;
+  flex: 1; /* 佔滿剩餘空間 */
+}
+
+/* 讓詞性按鈕可以左右滑動 (如果手機太窄) */
+.scroll-group {
+  overflow-x: auto;
+  padding-bottom: 4px; /* 預留捲軸空間 */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 共用按鈕樣式 (繼承之前的 sort-pill) */
+.sort-pill, .filter-pill {
+  background: #f1f3f5;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  color: #868e96;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 700;
+  white-space: nowrap; /* 按鈕文字不換行 */
+}
+
+.sort-pill:hover, .filter-pill:hover { background: #e9ecef; }
+
+.sort-pill.active { background: #5c7cfa; color: white; box-shadow: 0 2px 6px rgba(92, 124, 250, 0.3); }
+
+/* 詞性篩選選中時用不同顏色 (綠色) */
+.filter-pill.active { background: #51cf66; color: white; box-shadow: 0 2px 6px rgba(81, 207, 102, 0.3); }
+
+/* --- 等級選擇卡片 --- */
+.level-card {
+  display: flex;
+  justify-content: flex-start; /* 靠左對齊 */
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* N5, N4, N3 不同顏色 */
+.level-card.n5 .level-badge { background: #51cf66; color: white; }
+.level-card.n4 .level-badge { background: #ff922b; color: white; }
+.level-card.n3 .level-badge { background: #5c7cfa; color: white; }
+
+.level-badge {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.level-info {
+  font-size: 1.1rem;
+  color: #343a40;
+}
+
+/* Dashboard 上方的標籤 */
+.current-level-tag {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #343a40;
+  margin-bottom: 5px;
+}
+
+/* --- 修改：列表樣式調整 --- */
+
+/* 新增：中文意思標籤 (原本是詞性的樣式) */
+.meaning-tag {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1c7ed6;       /* 深藍色文字 */
+  background: #e7f5ff;  /* 淺藍色背景 */
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-right: 8px;
+  vertical-align: middle;
+  
+  /* 防止中文太長把版面撐壞，超過會顯示... */
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 新增：詞性灰字 (原本是中文的樣式) */
+.pos-text {
+  font-size: 0.85rem;
+  color: #adb5bd; /* 灰色 */
+  margin-left: 8px;
+}
+
+/* 調整分隔點的顏色 */
+.separator {
+  color: #dee2e6;
+  margin: 0 4px;
+  font-size: 0.8rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

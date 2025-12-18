@@ -1,0 +1,24 @@
+/* src/index.css */
+:root {
+  font-family: 'Nunito', 'Noto Sans JP', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  /* ✨ 魔法 1：漂亮的漸層背景 */
+  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+  /* 讓內容在畫面正中間 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden; /* 防止捲軸出現 */
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
