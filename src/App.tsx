@@ -26,6 +26,7 @@ function App() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [score, setScore] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFilter, setShowFilter] = useState(false); // ✨ 新增：控制篩選面板開關
   const [sortMode, setSortMode] = useState<SortMode>('default');
   const [filterPos, setFilterPos] = useState<FilterPos>('all');
 
@@ -174,7 +175,11 @@ function App() {
   }
 
   // 1. 各等級的主頁 (Dashboard)
+// 1. 各等級的主頁 (Dashboard)
   if (view === 'home') {
+    // ✨ 新增：計算目前等級已收藏(不熟)的單字數量
+    const currentSavedCount = activeList.filter(w => savedWords.includes(w.w)).length;
+
     return (
       <div className="app-container">
         <div className="home-screen">
@@ -184,25 +189,27 @@ function App() {
           </div>
 
           <div className="hero-section">
-            {/* 顯示當前等級的大字 */}
             <div className="current-level-tag">{level.toUpperCase()}</div>
             <div className="app-subtitle">學習儀表板</div>
           </div>
           
           <div className="menu-grid">
+            {/* ✨ 修改 1：顯示單字總數 */}
             <button onClick={() => { setSearchTerm(''); setView('list'); setSortMode('default'); setFilterPos('all'); }} className="btn menu-card">
               <div className="icon-box" style={{background: '#e7f5ff', color: '#5c7cfa'}}>📖</div>
-              <div>{level.toUpperCase()} 單字表</div>
+              <div>{level.toUpperCase()} 單字表 ({activeList.length})</div>
             </button>
             
+            {/* ✨ 修改 2：顯示不熟單字數 */}
             <button onClick={() => { setSearchTerm(''); setView('saved'); setSortMode('default'); setFilterPos('all'); }} className="btn menu-card">
               <div className="icon-box" style={{background: '#fff4e6', color: '#ff922b'}}>⭐</div>
-              <div>{level.toUpperCase()} 不熟單字</div>
+              <div>{level.toUpperCase()} 不熟單字 ({currentSavedCount})</div>
             </button>
 
+            {/* ✨ 修改 3：加上題數提示 (比較一致) */}
             <button onClick={startQuiz} className="btn menu-card">
               <div className="icon-box" style={{background: '#ebfbee', color: '#51cf66'}}>🎲</div>
-              <div>{level.toUpperCase()} 隨機測驗</div>
+              <div>{level.toUpperCase()} 隨機測驗 (50題)</div>
             </button>
           </div>
         </div>
@@ -224,31 +231,47 @@ function App() {
               <div style={{width: 40}}></div>
             </div>
             
-            <input 
-              type="text" 
-              placeholder="搜尋單字..." 
-              className="search-input"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-
-            <div className="control-row">
-              <span className="control-label">排序</span>
-              <div className="control-group">
-                <button className={`sort-pill ${sortMode === 'default' ? 'active' : ''}`} onClick={() => setSortMode('default')}>預設</button>
-                <button className={`sort-pill ${sortMode === 'aiueo' ? 'active' : ''}`} onClick={() => setSortMode('aiueo')}>50音</button>
-              </div>
+            {/* ✨ 新增：搜尋列 + 篩選按鈕容器 */}
+            <div className="search-row">
+              <input 
+                type="text" 
+                placeholder="搜尋單字..." 
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              
+              {/* ✨ 篩選開關按鈕 */}
+              <button 
+                className={`filter-toggle-btn ${showFilter ? 'active' : ''}`}
+                onClick={() => setShowFilter(!showFilter)}
+              >
+                {showFilter ? '▲ 收起' : '▼ 篩選'}
+              </button>
             </div>
 
-            <div className="control-row">
-              <span className="control-label">詞性</span>
-              <div className="control-group scroll-group">
-                <button className={`filter-pill ${filterPos === 'all' ? 'active' : ''}`} onClick={() => setFilterPos('all')}>全部</button>
-                <button className={`filter-pill ${filterPos === 'noun' ? 'active' : ''}`} onClick={() => setFilterPos('noun')}>名詞</button>
-                <button className={`filter-pill ${filterPos === 'verb' ? 'active' : ''}`} onClick={() => setFilterPos('verb')}>動詞</button>
-                <button className={`filter-pill ${filterPos === 'adj' ? 'active' : ''}`} onClick={() => setFilterPos('adj')}>形容詞</button>
+            {/* ✨ 可摺疊的控制面板 */}
+            {showFilter && (
+              <div className="filter-panel">
+                <div className="control-row">
+                  <span className="control-label">排序</span>
+                  <div className="control-group">
+                    <button className={`sort-pill ${sortMode === 'default' ? 'active' : ''}`} onClick={() => setSortMode('default')}>預設</button>
+                    <button className={`sort-pill ${sortMode === 'aiueo' ? 'active' : ''}`} onClick={() => setSortMode('aiueo')}>50音</button>
+                  </div>
+                </div>
+
+                <div className="control-row">
+                  <span className="control-label">詞性</span>
+                  <div className="control-group scroll-group">
+                    <button className={`filter-pill ${filterPos === 'all' ? 'active' : ''}`} onClick={() => setFilterPos('all')}>全部</button>
+                    <button className={`filter-pill ${filterPos === 'noun' ? 'active' : ''}`} onClick={() => setFilterPos('noun')}>名詞</button>
+                    <button className={`filter-pill ${filterPos === 'verb' ? 'active' : ''}`} onClick={() => setFilterPos('verb')}>動詞</button>
+                    <button className={`filter-pill ${filterPos === 'adj' ? 'active' : ''}`} onClick={() => setFilterPos('adj')}>形容詞</button>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           
           <div className="word-list" ref={listRef}>
