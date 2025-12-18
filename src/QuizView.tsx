@@ -19,7 +19,7 @@ export default function QuizView({ onFinish, onExit }: QuizViewProps) {
   // 1. 初始化：從 examData.ts 中隨機抽取 50 題
   useEffect(() => {
     const shuffled = [...examQuestions].sort(() => 0.5 - Math.random());
-    setQuestions(shuffled.slice(0, 50));
+    setQuestions(shuffled.slice(0, 30));
   }, []);
 
   // 2. 處理點擊答案

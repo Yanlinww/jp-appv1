@@ -1,10 +1,9 @@
 import { useState, useMemo, useEffect, useRef, useLayoutEffect } from 'react';
-import { allLevels, type Word } from './data';
-import QuizView from './QuizView'; // 確保有引入這個
+import { allLevels, n5GrammarList, type Word, type Grammar } from './data';
+import QuizView from './QuizView';
 import './App.css';
 
-// 定義頁面狀態
-type ViewMode = 'level_select' | 'home' | 'list' | 'saved' | 'quiz' | 'result' | 'detail';
+type ViewMode = 'level_select' | 'home' | 'list' | 'saved' | 'quiz' | 'result' | 'detail' | 'grammar_list' | 'grammar_detail';
 type SortMode = 'default' | 'aiueo';
 type FilterPos = 'all' | 'noun' | 'verb' | 'adj';
 type LevelKey = 'n5' | 'n4' | 'n3';
@@ -19,41 +18,38 @@ function App() {
   });
   
   const [selectedWord, setSelectedWord] = useState<Word | null>(null);
-  
-  // 測驗分數狀態
+  const [selectedGrammar, setSelectedGrammar] = useState<Grammar | null>(null);
+
   const [score, setScore] = useState(0);
   
-  // 搜尋與篩選狀態
   const [searchTerm, setSearchTerm] = useState('');
   const [sortMode, setSortMode] = useState<SortMode>('default');
   const [filterPos, setFilterPos] = useState<FilterPos>('all');
-  const [showFilter, setShowFilter] = useState(false); // 控制篩選面板開關
+  const [showFilter, setShowFilter] = useState(false);
 
   const listRef = useRef<HTMLDivElement>(null);
   const scrollPos = useRef(0);
 
-  // 取得當前等級的單字表
   const activeList = useMemo(() => allLevels[level], [level]);
 
-  // ESC 鍵監聽
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         if (view === 'detail') setView('list');
+        else if (view === 'grammar_detail') setView('grammar_list');
         else if (view === 'quiz') {
           if (window.confirm('確定退出測驗？')) setView('home');
         }
         else if (view === 'home') setView('level_select');
-        else if (view === 'list' || view === 'saved') setView('home');
+        else if (view !== 'level_select') setView('home');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [view]);
 
-  // 切換回列表時還原捲軸位置
   useLayoutEffect(() => {
-    if ((view === 'list' || view === 'saved') && listRef.current) {
+    if ((view === 'list' || view === 'saved' || view === 'grammar_list') && listRef.current) {
       listRef.current.scrollTop = scrollPos.current;
     }
   }, [view]);
@@ -84,7 +80,12 @@ function App() {
     setView('detail');
   };
 
-  // 篩選邏輯
+  const openGrammar = (grammar: Grammar) => {
+    if (listRef.current) scrollPos.current = listRef.current.scrollTop;
+    setSelectedGrammar(grammar);
+    setView('grammar_detail');
+  };
+
   const filteredList = useMemo(() => {
     let list = view === 'saved' 
       ? activeList.filter(v => savedWords.includes(v.w)) 
@@ -118,17 +119,13 @@ function App() {
     return list;
   }, [view, savedWords, searchTerm, sortMode, filterPos, activeList]);
 
-  // 測驗結束處理
   const handleQuizFinish = (finalScore: number) => {
     setScore(finalScore);
     setView('result');
   };
 
-  // ==========================================
-  // 畫面渲染區域
-  // ==========================================
+  // --- 畫面渲染 ---
 
-  // 0. 等級選擇頁
   if (view === 'level_select') {
     return (
       <div className="app-container">
@@ -157,7 +154,6 @@ function App() {
     );
   }
 
-  // 1. 主頁儀表板
   if (view === 'home') {
     const currentSavedCount = activeList.filter(w => savedWords.includes(w.w)).length;
     return (
@@ -175,13 +171,21 @@ function App() {
               <div className="icon-box" style={{background: '#e7f5ff', color: '#5c7cfa'}}>📖</div>
               <div>{level.toUpperCase()} 單字表 ({activeList.length})</div>
             </button>
+            
+            {level === 'n5' && (
+              <button onClick={() => setView('grammar_list')} className="btn menu-card">
+                <div className="icon-box" style={{background: '#fff9db', color: '#fab005'}}>📝</div>
+                <div>N5 文法 ({n5GrammarList.length})</div>
+              </button>
+            )}
+
             <button onClick={() => { setSearchTerm(''); setView('saved'); setSortMode('default'); setFilterPos('all'); }} className="btn menu-card">
               <div className="icon-box" style={{background: '#fff4e6', color: '#ff922b'}}>⭐</div>
               <div>{level.toUpperCase()} 不熟單字 ({currentSavedCount})</div>
             </button>
             <button onClick={() => setView('quiz')} className="btn menu-card">
               <div className="icon-box" style={{background: '#ebfbee', color: '#51cf66'}}>🎲</div>
-              <div>{level.toUpperCase()} 隨機測驗 (50題)</div>
+              <div>{level.toUpperCase()} 隨機測驗 (30題)</div>
             </button>
           </div>
         </div>
@@ -189,7 +193,100 @@ function App() {
     );
   }
 
-  // 2. 列表頁 (List & Saved)
+// 文法列表頁
+  if (view === 'grammar_list') {
+    return (
+      <div className="app-container">
+        <div className="list-screen">
+          <div className="sticky-header">
+            <div className="header-top">
+              <button onClick={() => setView('home')} className="btn-ghost">✕ 關閉</button>
+              <h2 className="page-title">N5 文法</h2>
+              <div style={{width: 40}}></div>
+            </div>
+          </div>
+          
+          <div className="word-list" ref={listRef}>
+            {/* ✨ 修改這裡：加入 index 參數 */}
+            {n5GrammarList.map((g, index) => (
+              <div 
+                key={g.id} 
+                className="word-item grammar-item" 
+                onClick={() => openGrammar(g)}
+                style={{cursor: 'pointer'}}
+              >
+                <div className="word-info">
+                  {/* ✨ 修改這裡：標題前面加上 index + 1 */}
+                  <div className="word-main" style={{fontSize: '1rem'}}>
+                    {index + 1}. {g.title}
+                  </div>
+                  <div className="word-sub" style={{color: '#868e96'}}>{g.rule}</div>
+                </div>
+                <div style={{color: '#dee2e6', paddingRight: 10}}>›</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 文法詳細頁
+  if (view === 'grammar_detail' && selectedGrammar) {
+    // 這裡原本就有計算 index，直接拿來用
+    const currentIndex = n5GrammarList.findIndex(g => g.id === selectedGrammar.id);
+    const hasPrev = currentIndex > 0;
+    const hasNext = currentIndex < n5GrammarList.length - 1;
+
+    const goToPrev = () => { if (hasPrev) setSelectedGrammar(n5GrammarList[currentIndex - 1]); };
+    const goToNext = () => { if (hasNext) setSelectedGrammar(n5GrammarList[currentIndex + 1]); };
+
+    return (
+      <div className="app-container">
+        <div className="detail-screen">
+          <div className="detail-header">
+            <button onClick={() => setView('grammar_list')} className="btn-ghost">← 文法列表</button>
+            <div></div> 
+          </div>
+
+          <div style={{flex: 1, overflowY: 'auto'}}>
+            <div className="detail-card">
+              {/* ✨ 修改這裡：標題前面加上 currentIndex + 1 */}
+              <div className="detail-word" style={{fontSize: '1.8rem'}}>
+                {currentIndex + 1}. {selectedGrammar.title}
+              </div>
+              <div className="grammar-rule-box">{selectedGrammar.rule}</div>
+            </div>
+
+            <div className="info-block">
+              <div className="info-label">解說 / 特徵</div>
+              <div className="info-content" style={{lineHeight: 1.6}}>{selectedGrammar.desc}</div>
+            </div>
+
+            <div className="info-block">
+              <div className="info-label">例句</div>
+              <div className="sentence-group">
+                {selectedGrammar.examples.map((ex, i) => (
+                  <div key={i} className="sentence-box" style={{marginBottom: 12}}>
+                    <div className="sentence-jp">{ex.jp}</div>
+                    <div className="sentence-cn">{ex.cn}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="detail-footer">
+            <button className="nav-btn" onClick={goToPrev} disabled={!hasPrev}>← 上一個</button>
+            <div className="nav-counter">{currentIndex + 1} / {n5GrammarList.length}</div>
+            <button className="nav-btn" onClick={goToNext} disabled={!hasNext}>下一個 →</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 列表頁
   if (view === 'list' || view === 'saved') {
     return (
       <div className="app-container">
@@ -279,7 +376,6 @@ function App() {
     );
   }
 
-  // 3. 詳細頁 (Detail)
   if (view === 'detail' && selectedWord) {
     const isSaved = savedWords.includes(selectedWord.w);
     const currentIndex = filteredList.findIndex(w => w.w === selectedWord.w);
@@ -338,7 +434,6 @@ function App() {
     );
   }
 
-  // 4. 測驗頁 (Quiz) - 使用我們剛剛寫的 QuizView
   if (view === 'quiz') {
     return (
       <QuizView 
@@ -348,7 +443,6 @@ function App() {
     );
   }
 
-  // 5. 結果頁 (Result)
   if (view === 'result') {
     return (
       <div className="app-container">
@@ -369,7 +463,6 @@ function App() {
     );
   }
 
-  // 如果都沒對應到，回傳空 (這是防呆，但如果上面邏輯正確就不會執行到這)
   return null;
 }
 
