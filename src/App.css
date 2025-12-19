@@ -1071,6 +1071,65 @@ body {
   font-weight: 500;
 }
 
+/* --- 測驗設定頁 --- */
+.setup-card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.setup-label {
+  font-size: 1rem;
+  color: #868e96;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.setup-value {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 20px;
+}
+
+/* 拉桿樣式 (Range Slider) */
+.range-slider {
+  width: 100%;
+  margin: 10px 0;
+  cursor: pointer;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 5px;
+  appearance: none; /* 移除預設樣式 */
+  outline: none;
+}
+
+.range-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(92, 124, 250, 0.4);
+  transition: transform 0.2s;
+}
+
+.range-slider::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  color: #adb5bd;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
