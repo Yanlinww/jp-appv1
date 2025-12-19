@@ -92,16 +92,33 @@ body {
 
 /* --- 首頁 (Home) --- */
 .home-screen {
-  padding: 40px 24px;
+  height: 100%;          /* 佔滿卡片高度 */
+  overflow-y: auto;      /* ✨ 關鍵：內容太長時允許垂直捲動 */
+  padding: 40px 24px;    /* 上下左右留白 */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 90vh;
+  align-items: center;   /* 水平置中 */
+  /* justify-content: center; <-- 刪掉這行，避免內容太長時上下都被切掉 */
+  
+  /* 讓捲動更順暢 */
+  -webkit-overflow-scrolling: touch; 
 }
 
+/* 為了讓內容在「不需捲動」時依然垂直置中，我們用 margin */
 .hero-section {
   text-align: center;
-  margin-bottom: 40px;
+  margin-top: auto;      /* ✨ 上方自動填滿 */
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: auto;   /* ✨ 下方自動填滿 */
+  padding-bottom: 40px;  /* ✨ 底部多留一點空間，防止按鈕貼底 */
 }
 
 .app-title {
@@ -117,11 +134,6 @@ body {
   font-size: 0.95rem;
 }
 
-.menu-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
 
 .menu-card {
   background: white;
@@ -331,12 +343,42 @@ body {
 }
 
 .result-screen {
-  text-align: center;
-  padding: 40px 24px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 80vh;
+  height: 100%;          /* 佔滿卡片 */
+  background: #f8f9fa;
+  overflow: hidden;      /* 防止外層捲動 */
+}
+
+/* 上半部：分數 (固定不動) */
+.score-section {
+  padding: 30px 20px;
+  background: white;
+  text-align: center;
+  border-bottom: 1px solid #f1f3f5;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  z-index: 10;
+  flex-shrink: 0;        /* ✨ 關鍵：不要被擠壓 */
+}
+
+/* 中間：檢討清單 (只有這裡捲動) */
+.review-list {
+  flex: 1;               /* ✨ 佔滿剩餘空間 */
+  overflow-y: auto;      /* ✨ 允許捲動 */
+  padding: 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 底部：按鈕區 (固定在最下方) */
+.result-footer {
+  padding: 20px;
+  background: white;
+  border-top: 1px solid #f1f3f5;
+  flex-shrink: 0;        /* ✨ 關鍵：不要被擠壓 */
+  z-index: 10;
+  /* 確保按鈕區有足夠空間 */
+  padding-bottom: 30px; 
 }
 
 .score-circle {
@@ -974,6 +1016,59 @@ body {
   margin-bottom: 12px;  /* 與下方副標題的距離 */
   letter-spacing: 0.5px; /* 字距稍微寬一點 */
   box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+/* --- 數字與量詞頁面 --- */
+.num-badge {
+  background: #3bc9db; /* 青藍色 */
+  color: white;
+  font-family: 'Courier New', monospace; /* 讓 # 號看起來比較酷 */
+}
+
+/* 數字區塊標題 */
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #343a40;
+  margin: 20px 0 10px 0;
+  border-left: 4px solid #3bc9db;
+  padding-left: 10px;
+}
+
+/* 網格排列 (一排兩個) */
+.number-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* 單個數字卡 */
+.number-card {
+  background: white;
+  border: 1px solid #f1f3f5;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  transition: transform 0.2s;
+}
+
+.number-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.num-label {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #3bc9db;
+  margin-bottom: 4px;
+}
+
+.num-reading {
+  font-size: 0.9rem;
+  color: #495057;
+  font-weight: 500;
 }
 
 @keyframes fadeIn {
