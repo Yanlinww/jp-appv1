@@ -1130,6 +1130,86 @@ body {
   margin-top: 5px;
 }
 
+/* --- 橫向滑動容器 (Swipe View) --- */
+.swipe-wrapper {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  height: 100%;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  cursor: grab; /* ✨ 預設是手掌 */
+  user-select: none; /* ✨ 防止滑動時選取到文字 */
+}
+
+.swipe-wrapper:active {
+  cursor: grabbing; /* ✨ 按下時變成抓取手勢 */
+}
+
+/* 每一個分頁 */
+/* src/App.css */
+
+/* 每一個分頁 */
+.swipe-page {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: center;
+  
+  /* ✨ 修改這裡：改成 hidden，把這層的捲軸關掉 */
+  overflow-y: hidden; 
+  /* 原本是 overflow-y: auto; <-- 這是導致雙捲軸的元兇 */
+}
+
+/* 分頁指示點 (Pagination Dots) */
+.pagination-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #dee2e6;
+  transition: all 0.3s;
+}
+
+.dot.active {
+  background: #5c7cfa; /* 藍色 */
+  width: 20px; /* 變長條狀 */
+  border-radius: 4px;
+}
+
+/* 考古題專區樣式 */
+.exam-card {
+  border: 2px dashed #e9ecef; /* 虛線邊框 */
+  background: #fff;
+  color: #868e96;
+}
+
+.exam-badge {
+  background: #868e96;
+  color: white;
+  font-family: 'Courier New', monospace;
+}
+
+/* --- 短句按鈕樣式 --- */
+.phrase-badge {
+  background: #e64980; /* 粉紅色 */
+  color: white;
+}
+
+.phrase-card {
+  border-left: 4px solid #e64980;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
