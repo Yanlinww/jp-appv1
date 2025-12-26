@@ -1,9 +1,9 @@
 // src/firebase.ts
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+// ✨ 1. 多引入 enableIndexedDbPersistence
+import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 
-// 你的 Firebase 設定 (已填入你提供的資訊)
 const firebaseConfig = {
   apiKey: "AIzaSyCF-lLVWyiAKyt1CTR_xUEBeG2wuvlmRdM",
   authDomain: "jp-learning-app-be926.firebaseapp.com",
@@ -14,15 +14,22 @@ const firebaseConfig = {
   measurementId: "G-F8WSZ7JJZ2"
 };
 
-// 1. 初始化 Firebase (只做一次)
 const app = initializeApp(firebaseConfig);
 
-// 2. 匯出功能給 App.tsx 使用
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// ✨ 2. 啟用離線資料庫支援
+enableIndexedDbPersistence(db).catch((err) => {
+  if (err.code == 'failed-precondition') {
+    console.log('多個分頁開啟中，離線模式僅能在一個分頁運作');
+  } else if (err.code == 'unimplemented') {
+    console.log('瀏覽器不支援離線模式');
+  }
+});
+
 export const googleProvider = new GoogleAuthProvider();
 
-// 3. 登入函式
 export const loginWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -33,12 +40,11 @@ export const loginWithGoogle = async () => {
   }
 };
 
-// 4. 登出函式
 export const logout = async () => {
   try {
     await signOut(auth);
     alert("已登出");
-    window.location.reload(); // 重新整理以清除狀態
+    window.location.reload(); 
   } catch (error) {
     console.error("登出失敗", error);
   }

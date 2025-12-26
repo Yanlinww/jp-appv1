@@ -42,8 +42,9 @@ export default function ExamView({ paper, onExit }: ExamViewProps) {
   };
 
   return (
-    <div className="app-container">
-      <div className="list-screen">
+    
+      <div className="app-container">
+    <div className="list-screen"> {/* ✨ 刪掉 style，讓 CSS 控制 */}
         <div className="sticky-header">
           <div className="header-top">
             <button onClick={onExit} className="btn-ghost">✕ 退出</button>

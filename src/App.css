@@ -2532,6 +2532,385 @@ input[type="time"] {
   background-color: #000000;
 }
 
+/* src/App.css (請加在最下方) */
+
+/* --- 考古題測驗頁 (Exam View) 深色模式修正 --- */
+
+/* 1. 確保背景全黑 */
+[data-theme="dark"] .exam-content {
+  background-color: #000000;
+}
+
+/* 2. 題目卡片變深灰 */
+[data-theme="dark"] .exam-question-box {
+  background-color: #1c1c1e;
+  border: 1px solid #38383a;
+  box-shadow: none;
+}
+
+/* 3. 題目文字變白 */
+[data-theme="dark"] .exam-q-text {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .q-id {
+  color: #8a8a8e;
+}
+
+/* 4. 區塊標題 (例如：文字・語彙...) */
+[data-theme="dark"] .exam-section-title {
+  color: #e5e5ea;
+  border-left-color: var(--primary);
+}
+
+/* 5. 選項按鈕 (未選中狀態) */
+[data-theme="dark"] .exam-opt-btn {
+  background-color: #2c2c2e; /* 比卡片稍微亮一點 */
+  border: 1px solid #38383a;
+  color: #ffffff;
+}
+
+/* 選項按鈕 (選中狀態 - 保持藍色，但文字要清楚) */
+[data-theme="dark"] .exam-opt-btn.active {
+  background-color: rgba(92, 124, 250, 0.2); /* 藍色半透明 */
+  border-color: var(--primary);
+  color: #a5b4fc; /* 淺藍色文字 */
+}
+
+/* 6. 題目中的高亮文字 (__) */
+[data-theme="dark"] .highlight-text {
+  background-color: rgba(92, 124, 250, 0.3);
+  color: #ffffff;
+  text-decoration-color: var(--primary);
+}
+
+/* 7. 交卷後的正確/錯誤樣式微調 */
+[data-theme="dark"] .exam-question-box.correct {
+  background-color: rgba(81, 207, 102, 0.1);
+  border-color: #2b8a3e;
+}
+
+[data-theme="dark"] .exam-question-box.wrong {
+  background-color: rgba(255, 107, 107, 0.1);
+  border-color: #c92a2a;
+}
+
+/* src/App.css (請加在最下方) */
+
+/* --- 1. 首頁右上角頭像 (Home Header) --- */
+.home-header-row {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  z-index: 20; /* 確保浮在最上層 */
+}
+
+.mini-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #868e96;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.mini-avatar:active {
+  transform: scale(0.95);
+}
+
+.mini-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 深色模式修正 */
+[data-theme="dark"] .mini-avatar {
+  background: #2c2c2e;
+  border-color: #1c1c1e;
+  color: #adb5bd;
+}
+
+/* --- 2. 底部導航列 (Bottom Navigation) --- */
+.bottom-nav-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px; /* 導航列高度 */
+  background: rgba(255, 255, 255, 0.95); /* 半透明白底 */
+  backdrop-filter: blur(10px); /* 毛玻璃特效 */
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start; /* 靠上對齊，留出底部安全區 */
+  padding-top: 12px;
+  border-top: 1px solid #f1f3f5;
+  z-index: 50;
+  box-sizing: border-box;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 60px;
+  color: #adb5bd; /* 預設灰色 */
+  transition: color 0.2s;
+}
+
+.nav-icon {
+  font-size: 1.5rem;
+  transition: transform 0.2s;
+}
+
+.nav-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* 激活狀態 */
+.nav-item.active {
+  color: var(--primary); /* 變成主題色 */
+}
+
+.nav-item.active .nav-icon {
+  transform: translateY(-2px);
+}
+
+/* 為了不被導航列擋住，內容區底部要留白 */
+.home-screen, .exam-screen, .settings-screen {
+  padding-bottom: 90px !important; /* 增加底部留白 */
+}
+
+/* --- 深色模式導航列修正 --- */
+[data-theme="dark"] .bottom-nav-bar {
+  background: rgba(28, 28, 30, 0.95);
+  border-top: 1px solid #38383a;
+}
+
+[data-theme="dark"] .nav-item {
+  color: #636366;
+}
+
+[data-theme="dark"] .nav-item.active {
+  color: #748ffc; /* 深色模式下的亮藍色 */
+}
+
+/* src/App.css (加在最下方) */
+
+/* --- 第二頁：工具箱 (Tools Page) --- */
+
+/* 格線容器：一排一個，或一排兩個，視你喜好，這裡設定統一高度的卡片列表 */
+.tools-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  padding-bottom: 100px; /* 避開底部導航 */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 工具卡片樣式 (統一框框) */
+.tool-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 圖示在左，文字在右，或分開 */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+  height: 90px; /* ✨ 固定高度，讓它們看起來一樣大 */
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card:active {
+  transform: scale(0.98);
+  border-color: var(--primary);
+}
+
+.tool-icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.tool-info {
+  flex: 1;
+  text-align: left;
+}
+
+.tool-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.tool-desc {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+/* 裝飾用箭頭 */
+.tool-arrow {
+  font-size: 1.5rem;
+  color: #e9ecef;
+}
+
+/* 針對深色模式 */
+[data-theme="dark"] .tool-card {
+  background: #1c1c1e;
+  border: 1px solid #38383a;
+}
+
+/* src/App.css (請加在最下方) */
+
+/* --- 修正：底部導航列擋住內容的問題 --- */
+
+/* 針對所有列表容器增加底部內距 */
+.settings-content,      /* 設定頁 */
+.tools-container,       /* 工具頁 */
+.exam-list-container,   /* 試題頁 */
+.menu-grid,             /* 首頁選單 */
+.word-list,             /* 單字列表 */
+.review-list            /* 測驗結果列表 */
+{
+  /* 導航列高度約 80px，這裡設 120px 確保有足夠緩衝空間 */
+  padding-bottom: 120px !important; 
+}
+
+/* 針對 N1, N2 的顏色樣式 (如果原本沒有定義) */
+.level-card.n2 .level-badge { background: #228be6; color: white; } /* 亮藍色 */
+.level-card.n1 .level-badge { background: #1c7ed6; color: white; } /* 深藍色 */
+
+/* 深色模式下的 N1, N2 文字修正 */
+[data-theme="dark"] .level-card.n2 .level-info,
+[data-theme="dark"] .level-card.n1 .level-info {
+  color: white;
+}
+
+/* src/App.css (請加在最下方) */
+
+/* --- 優化：縮小結果頁 (Result Screen) 上方區塊 --- */
+.score-section {
+  padding: 15px 20px; /* 上下內距縮小 (原本30px) */
+  min-height: auto;   /* 移除最小高度限制 */
+}
+
+.score-circle {
+  width: 80px;        /* 縮小圓圈寬度 (原本120px) */
+  height: 80px;       /* 縮小圓圈高度 */
+  margin: 0 auto 10px auto; /* 縮小下方邊距 */
+  border-width: 3px;  /* 邊框稍微變細 */
+}
+
+.score-number {
+  font-size: 2rem;    /* 字體縮小 (原本3.5rem) */
+}
+
+.score-label {
+  font-size: 0.75rem; /* 字體縮小 */
+  margin-top: 2px;
+}
+
+.result-screen h2 {
+  font-size: 1.2rem;  /* "測驗結果" 標題縮小 */
+  margin-bottom: 10px !important;
+}
+
+/* --- 新增：測驗中 (Quiz View) 的即時解析樣式 --- */
+.quiz-expl-box {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(0,0,0,0.1);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-main);
+  text-align: left;
+}
+
+.quiz-expl-label {
+  font-weight: 700;
+  color: var(--primary);
+  margin-right: 6px;
+  font-size: 0.85rem;
+  background: rgba(92, 124, 250, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* 深色模式適配 */
+[data-theme="dark"] .quiz-expl-box {
+  border-top-color: rgba(255,255,255,0.15);
+  color: #e5e5ea;
+}
+
+[data-theme="dark"] .quiz-expl-label {
+  background: rgba(92, 124, 250, 0.2);
+  color: #a5b4fc;
+}
+
+/* src/App.css (加在最下方) */
+
+/* --- 填空題框框樣式 --- */
+.quiz-gap-box {
+  display: inline-block;
+  min-width: 40px;
+  height: 36px;
+  line-height: 36px;
+  border-bottom: 3px solid var(--primary);
+  background: rgba(92, 124, 250, 0.1);
+  color: transparent; /* 預設不顯示答案 */
+  text-align: center;
+  margin: 0 4px;
+  border-radius: 4px;
+  vertical-align: middle;
+  padding: 0 8px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+
+/* 作答後顯示答案 */
+.quiz-gap-box.filled {
+  color: var(--primary);
+  background: rgba(92, 124, 250, 0.2);
+  border-bottom-color: transparent; /* 變回一般底色 */
+}
+
+/* 深色模式適配 */
+[data-theme="dark"] .quiz-gap-box {
+  border-bottom-color: #748ffc;
+  background: rgba(116, 143, 252, 0.2);
+}
+
+[data-theme="dark"] .quiz-gap-box.filled {
+  color: #a5b4fc;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }

@@ -5,6 +5,7 @@ export interface ExamQuestion {
   q: string;       // 題目
   options: string[]; // 選項
   a: string;       // 正確答案
+  explanation?: string; // ✨ 新增：解析 (可選)
 }
 
 export const examQuestions: ExamQuestion[] = [

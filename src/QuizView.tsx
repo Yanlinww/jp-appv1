@@ -1,7 +1,7 @@
 // src/QuizView.tsx
 import { useState, useEffect, useMemo } from 'react';
 import { type ExamQuestion } from './examData';
-import { n5List, type Word } from './data'; // ✨ 引入單字庫來查解析
+import { n5List } from './data'; 
 
 export interface QuizLog {
   question: ExamQuestion;
@@ -22,11 +22,9 @@ export default function QuizView({ list, count, onFinish, onExit }: QuizViewProp
   const [score, setScore] = useState(0);
   const [history, setHistory] = useState<QuizLog[]>([]);
   
-  // 狀態控制
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false);
 
-  // 初始化題目
   useEffect(() => {
     if (list.length > 0) {
       const shuffled = [...list].sort(() => 0.5 - Math.random());
@@ -35,16 +33,12 @@ export default function QuizView({ list, count, onFinish, onExit }: QuizViewProp
     }
   }, [list, count]);
 
-  // ✨ 智慧解析邏輯：根據當前題目(q)，去 n5List 找詳細資料
   const currentDetails = useMemo(() => {
     if (questions.length === 0) return null;
     const currentQ = questions[currentIndex];
-    
-    // 嘗試用題目 (q) 去對應單字 (w)
     return n5List.find(word => word.w === currentQ.q) || null;
   }, [questions, currentIndex]);
 
-  // 處理作答
   const handleAnswer = (answerText: string) => {
     if (hasAnswered) return;
 
@@ -61,9 +55,7 @@ export default function QuizView({ list, count, onFinish, onExit }: QuizViewProp
     };
     setHistory([...history, log]);
 
-    if (isCorrect) {
-      setScore(score + 1);
-    }
+    if (isCorrect) setScore(score + 1);
   };
 
   const handleNext = () => {
@@ -89,11 +81,37 @@ export default function QuizView({ list, count, onFinish, onExit }: QuizViewProp
     onFinish(score, [...history, ...remainingLogs]);
   };
 
+  // ✨ 題目格式化：把 "（　）" 變成特殊的填空框框
+  const renderFormattedQuestion = (text: string) => {
+    if (!text) return text;
+    // 分割字串，找到 （　）
+    const parts = text.split('（　）');
+    if (parts.length === 1) return text; // 如果沒有填空，直接回傳
+
+    return (
+      <span>
+        {parts.map((part, index) => (
+          <span key={index}>
+            {part}
+            {/* 如果不是最後一段，代表這裡原本有個括號，插入填空框 */}
+            {index < parts.length - 1 && (
+              <span className={`quiz-gap-box ${hasAnswered ? 'filled' : ''}`}>
+                {hasAnswered ? questions[currentIndex].a : '　'}
+              </span>
+            )}
+          </span>
+        ))}
+      </span>
+    );
+  };
+
   if (questions.length === 0) return <div className="loading" style={{padding:40, textAlign:'center'}}>準備題目中...</div>;
 
   const currentQ = questions[currentIndex];
   const progress = ((currentIndex) / questions.length) * 100;
   const isCurrentCorrect = selectedOption === currentQ.a;
+  
+  const explanation = (currentQ as any).explanation;
 
   return (
     <div className="app-container">
@@ -108,40 +126,32 @@ export default function QuizView({ list, count, onFinish, onExit }: QuizViewProp
           <div className="progress-fill" style={{width: `${progress}%`}}></div>
         </div>
 
-        {/* 題目卡片 */}
         <div className="flash-card mc-card">
-          <div className="quiz-question-type">請選擇正確的意思/讀音</div>
-          <div className="quiz-word" style={{fontSize: currentQ.q.length > 5 ? '2.5rem' : '3.5rem'}}>
-            {currentQ.q}
+          <div className="quiz-question-type">請填入正確的助詞</div>
+          <div className="quiz-word" style={{fontSize: currentQ.q.length > 10 ? '1.5rem' : '2rem', lineHeight: '1.6'}}>
+            {renderFormattedQuestion(currentQ.q)}
           </div>
           
-          {/* ✨ 解析區塊：已作答時才顯示 (樣式優化版) */}
           {hasAnswered && (
             <div className={`feedback-box ${isCurrentCorrect ? 'fb-correct' : 'fb-wrong'}`}>
               <div className="fb-header">
                 {isCurrentCorrect ? '⭕ 答對了！' : '❌ 答錯了'}
               </div>
-              
               <div className="fb-content">
                 <div className="fb-row">
                   <span className="fb-label">正解</span>
                   <span className="fb-value-lg">{currentQ.a}</span>
                 </div>
-
-                {/* 如果有找到詳細資料，就顯示中文意思 */}
-                {currentDetails && (
+                {explanation && (
+                  <div className="quiz-expl-box">
+                    <span className="quiz-expl-label">解析</span>
+                    {explanation}
+                  </div>
+                )}
+                {!explanation && currentDetails && (
                   <>
                     <div className="fb-divider"></div>
-                    <div className="fb-row">
-                      <span className="fb-label">意思</span>
-                      <span className="fb-value">{currentDetails.m}</span>
-                    </div>
-                    {currentDetails.p && (
-                      <div className="fb-row">
-                        <span className="fb-label">詞性</span>
-                        <span className="fb-value">{currentDetails.p}</span>
-                      </div>
-                    )}
+                    <div className="fb-row"><span className="fb-label">意思</span><span className="fb-value">{currentDetails.m}</span></div>
                   </>
                 )}
               </div>
@@ -149,26 +159,22 @@ export default function QuizView({ list, count, onFinish, onExit }: QuizViewProp
           )}
         </div>
 
-        {/* 選項區 */}
         <div className="options-grid">
           {currentQ.options.map((opt, idx) => {
             let btnClass = "option-btn";
-            
             if (hasAnswered) {
               if (opt === currentQ.a) btnClass += " correct"; 
               else if (opt === selectedOption) btnClass += " wrong";
               else btnClass += " muted";
             }
-
             return (
               <button key={idx} className={btnClass} onClick={() => handleAnswer(opt)}>
-                <div className="opt-reading" style={{fontSize: '1.1rem'}}>{opt}</div>
+                <div className="opt-reading" style={{fontSize: '1.2rem', fontWeight: 'bold'}}>{opt}</div>
               </button>
             );
           })}
         </div>
 
-        {/* 下一題按鈕 */}
         {hasAnswered && (
           <div className="quiz-footer-action">
             <button className="btn btn-primary next-btn" onClick={handleNext}>

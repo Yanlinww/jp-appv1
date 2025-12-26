@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
@@ -10,9 +11,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: '日文單字本',
-        short_name: '日文單字',
-        description: '我的日文學習 App',
+        name: '日本語 Go',
+        short_name: '日本語Go',
+        description: 'N5-N3 日語單字學習與測驗',
         theme_color: '#ffffff',
         icons: [
           {
