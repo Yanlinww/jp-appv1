@@ -2842,15 +2842,17 @@ input[type="time"] {
   margin-bottom: 10px !important;
 }
 
-/* --- 新增：測驗中 (Quiz View) 的即時解析樣式 --- */
 .quiz-expl-box {
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px dashed rgba(0,0,0,0.1);
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.6; /* 行距稍微拉大一點 */
   color: var(--text-main);
   text-align: left;
+  
+  /* ✨ 關鍵修改：支援 \n 換行 */
+  white-space: pre-wrap; 
 }
 
 .quiz-expl-label {
@@ -2909,6 +2911,255 @@ input[type="time"] {
 
 [data-theme="dark"] .quiz-gap-box.filled {
   color: #a5b4fc;
+}
+
+/* src/App.css (請加在最下方) */
+
+/* --- 自訂筆記 (Note Editor) 樣式 --- */
+.note-preview-card {
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: relative;
+  white-space: pre-wrap; /* 保留換行 */
+  line-height: 1.6;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.note-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.note-preview-card:hover .note-actions {
+  opacity: 1;
+}
+
+.note-action-btn {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.note-editor-box {
+  margin-top: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;
+  animation: fadeIn 0.3s;
+}
+
+.note-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tool-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: white;
+  color: #333;
+  position: relative;
+}
+
+.tool-btn:hover { background: #e9ecef; }
+.tool-btn.active { background: #e7f5ff; border-color: var(--primary); color: var(--primary); }
+
+.hidden-color-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  top: 0; left: 0;
+}
+
+.note-textarea {
+  width: 100%;
+  height: 100px;
+  border: none;
+  padding: 12px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  resize: vertical;
+  outline: none;
+}
+
+.note-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 12px;
+  gap: 10px;
+  border-top: 1px solid #f1f3f5;
+  background: white;
+}
+
+/* 深色模式適配 */
+[data-theme="dark"] .note-editor-box,
+[data-theme="dark"] .note-toolbar,
+[data-theme="dark"] .note-footer,
+[data-theme="dark"] .tool-btn {
+  background: #1c1c1e;
+  border-color: #38383a;
+  color: white;
+}
+
+[data-theme="dark"] .note-action-btn {
+  background: #2c2c2e;
+  border-color: #38383a;
+  color: white;
+}
+
+/* src/App.css (請加在最下方) */
+
+/* --- 富文本編輯器 (Rich Text Editor) 樣式 --- */
+
+/* 預覽區塊 */
+.note-preview-box {
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 20px;
+  background: #fff9db; /* 預設淡黃色底，模擬便利貼 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: relative;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.note-html-content {
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 編輯器容器 */
+.note-editor-box {
+  margin-top: 20px;
+  border: 2px solid var(--primary); /* 編輯中用藍框 */
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;
+  animation: fadeIn 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 工具列 */
+.note-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tool-separator {
+  width: 1px;
+  height: 20px;
+  background: #dee2e6;
+  margin: 0 4px;
+}
+
+.tool-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #495057;
+  transition: all 0.2s;
+}
+
+.tool-btn:hover {
+  background: #e9ecef;
+}
+
+/* 顏色選擇器包裝 */
+.tool-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  background: white;
+  border: 1px solid transparent;
+}
+
+.tool-wrapper:hover {
+  background: #e9ecef;
+}
+
+.hidden-color-picker {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* 編輯輸入區 (ContentEditable) */
+.rich-editor-area {
+  min-height: 120px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 16px;
+  outline: none;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.rich-editor-area:empty:before {
+  /* ✨ 修改這裡：讀取 data-placeholder 的值 */
+  content: attr(data-placeholder);
+  color: #adb5bd;
+  display: block;
+}
+
+/* 深色模式適配 */
+[data-theme="dark"] .note-preview-box {
+  background: #2c2c2e;
+  border-color: #38383a;
+  color: white;
+}
+
+[data-theme="dark"] .note-editor-box,
+[data-theme="dark"] .note-toolbar,
+[data-theme="dark"] .rich-editor-area,
+[data-theme="dark"] .tool-btn,
+[data-theme="dark"] .tool-wrapper,
+[data-theme="dark"] .note-footer {
+  background: #1c1c1e;
+  border-color: #38383a;
+  color: white;
+}
+
+[data-theme="dark"] .tool-btn:hover,
+[data-theme="dark"] .tool-wrapper:hover {
+  background: #2c2c2e;
 }
 
 @keyframes fadeIn {
