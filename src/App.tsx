@@ -25,6 +25,7 @@ function App() {
 
   const [user, setUser] = useState<User | null>(null);
   const [isCloudSyncing, setIsCloudSyncing] = useState(false);
+  const [lastListView, setLastListView] = useState<ViewMode>('list'); 
 
   // --- Data State ---
   const [savedWords, setSavedWords] = useState<string[]>(() => {
@@ -73,7 +74,7 @@ function App() {
   const [initialSwipePage, setInitialSwipePage] = useState(0);
 
   const activeList = useMemo(() => allLevels[level], [level]);
-  const APP_VERSION = "Ver 2025.12.27";
+  const APP_VERSION = "Ver 2025.1.8";
   const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
   // --- Effects ---
@@ -150,7 +151,7 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (view === 'detail') setView('list');
+        if (view === 'detail') setView(lastListView);
         else if (view === 'grammar_detail') setView('grammar_list');
         else if (view === 'basic_numbers') setView('level_select');
         else if (view === 'short_phrases') setView('level_select');
@@ -182,8 +183,17 @@ function App() {
   const exitExamYearSelect = () => { setInitialSwipePage(2); setView('level_select'); }; 
   const toggleSave = (word: string) => { setSavedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]); };
   
-  const openDetail = (word: Word) => { if (listRef.current) scrollPos.current = listRef.current.scrollTop; setSelectedWord(word); setView('detail'); };
-  const openGrammar = (grammar: Grammar) => { if (listRef.current) scrollPos.current = listRef.current.scrollTop; setSelectedGrammar(grammar); setView('grammar_detail'); };
+const openDetail = (word: Word) => {
+    if (listRef.current) scrollPos.current = listRef.current.scrollTop;
+    
+    // 記住現在是在 'list' 還是 'saved'，這樣返回時才知道回哪
+    if (view === 'list' || view === 'saved') {
+      setLastListView(view);
+    }
+    
+    setSelectedWord(word);
+    setView('detail');
+  };  const openGrammar = (grammar: Grammar) => { if (listRef.current) scrollPos.current = listRef.current.scrollTop; setSelectedGrammar(grammar); setView('grammar_detail'); };
   const openExam = (paper: ExamPaper) => { setSelectedExam(paper); setView('exam'); };
   const toggleFilter = (tag: string) => { setFilterPos(prev => { if (tag === 'all') return ['all']; let newFilters = prev.filter(t => t !== 'all'); if (newFilters.includes(tag)) newFilters = newFilters.filter(t => t !== tag); else newFilters = [...newFilters, tag]; return newFilters.length === 0 ? ['all'] : newFilters; }); };
   const handleClearCache = () => { if (window.confirm('確定清除快取？')) { localStorage.clear(); window.location.reload(); } };
@@ -203,13 +213,42 @@ function App() {
     });
   };
 
-  const filteredList = useMemo(() => {
-    let list = view === 'saved' ? activeList.filter(v => savedWords.includes(v.w)) : activeList;
-    if (searchTerm) { const lower = searchTerm.toLowerCase(); list = list.filter(v => v.w.includes(lower) || v.r.includes(lower) || v.m.includes(lower)); }
-    if (!filterPos.includes('all')) { list = list.filter(v => { if (filterPos.includes('noun') && v.p.includes('名詞')) return true; if (filterPos.includes('verb') && v.p.includes('動詞')) return true; if (filterPos.includes('adj') && (v.p.includes('形容詞') || v.p.includes('形容詞'))) return true; if (filterPos.includes('phrase') && (v.p.includes('寒暄') || v.p.includes('短句') || v.p.includes('問候') || v.p.includes('感嘆詞') || v.p.includes('用餐') || v.p.includes('外出') || v.p.includes('返家') || v.p.includes('介紹') || v.p.includes('工作') || v.p.includes('回答') || v.p.includes('祝賀') || v.p.includes('請求') || v.p.includes('疑問') || v.p.includes('購物') || v.p.includes('旅遊'))) return true; return false; }); }
-    if (sortMode === 'aiueo') { list = [...list].sort((a, b) => { const getCleanReading = (str: string) => str.replace(/[一-龠々〆ヵヶ()（）]/g, ''); return getCleanReading(a.r).localeCompare(getCleanReading(b.r), 'ja'); }); }
+const filteredList = useMemo(() => {
+    // ✨ 關鍵邏輯：如果是 'detail' 模式，就使用 'lastListView' (來源) 來決定列表
+    // 這樣在單字卡裡按下一頁時，才會是在「不熟單字」裡面找下一個
+    const currentMode = view === 'detail' ? lastListView : view;
+
+    let list = currentMode === 'saved' 
+      ? activeList.filter(v => savedWords.includes(v.w)) 
+      : activeList;
+    
+    if (searchTerm) {
+      const lower = searchTerm.toLowerCase();
+      list = list.filter(v => 
+        v.w.includes(lower) || v.r.includes(lower) || v.m.includes(lower)
+      );
+    }
+
+    if (!filterPos.includes('all')) {
+      list = list.filter(v => {
+        if (filterPos.includes('noun') && v.p.includes('名詞')) return true;
+        if (filterPos.includes('verb') && v.p.includes('動詞')) return true;
+        if (filterPos.includes('adj') && (v.p.includes('形容詞') || v.p.includes('形容詞'))) return true;
+        if (filterPos.includes('phrase') && (v.p.includes('寒暄') || v.p.includes('短句') || v.p.includes('問候') || v.p.includes('感嘆詞') || v.p.includes('用餐') || v.p.includes('外出') || v.p.includes('返家') || v.p.includes('介紹') || v.p.includes('工作') || v.p.includes('回答') || v.p.includes('祝賀') || v.p.includes('請求') || v.p.includes('疑問') || v.p.includes('購物') || v.p.includes('旅遊'))) return true;
+        return false;
+      });
+    }
+
+    if (sortMode === 'aiueo') {
+      list = [...list].sort((a, b) => {
+        const getCleanReading = (str: string) => str.replace(/[一-龠々〆ヵヶ()（）]/g, ''); 
+        const rA = getCleanReading(a.r);
+        const rB = getCleanReading(b.r);
+        return rA.localeCompare(rB, 'ja');
+      });
+    }
     return list;
-  }, [view, savedWords, searchTerm, sortMode, filterPos, activeList]);
+  }, [view, lastListView, savedWords, searchTerm, sortMode, filterPos, activeList]); // ✨ 記得加入 lastListView 到依賴陣列
 
   const handleQuizFinish = (finalScore: number, history: QuizLog[]) => { setScore(finalScore); setQuizHistory(history); setView('result'); };
   const initQuiz = (mode: QuizMode) => { setQuizMode(mode); if (mode === 'saved' && activeList.filter(w => savedWords.includes(w.w)).length < 4) { alert('收藏單字不足 4 個！'); return; } setView('quiz_setup'); };
@@ -330,20 +369,22 @@ function App() {
   if (view === 'result') { return (<div className="app-container"><div className="result-screen"><div className="score-section"><div className="score-circle"><div className="score-number">{score}</div><div className="score-label">分 (共{quizHistory.length}題)</div></div><h2 style={{marginBottom: 20, color: 'var(--text-main)'}}>測驗結果</h2></div><div className="review-list"><h3 style={{marginLeft: 10, color: 'var(--text-sub)', fontSize: '0.9rem', marginBottom: 10}}>詳細檢討</h3>{quizHistory.map((log, i) => { const details = allLevels.n5.find(w => w.w === log.question.q); const explanation = (log.question as any).explanation; return (<div key={i} className={`review-item ${log.isCorrect ? 'correct' : 'wrong'}`}><div className="review-header"><div className="review-q"><span style={{color:'var(--text-sub)', marginRight:8, fontSize:'0.9rem'}}>{i + 1}.</span> {log.question.q}</div><span className={`status-text ${log.isCorrect ? 'correct' : 'wrong'}`}>{log.isCorrect ? 'Correct' : 'Mistake'}</span></div><div className="review-body">{!log.isCorrect && (<div className="ans-row"><span className="label-text">你選</span><span className="val-text wrong">{log.userAnswer}</span></div>)}<div className="ans-row"><span className="label-text">正解</span><span className="val-text correct">{log.question.a}</span></div></div>{(explanation || details) && (<div className="review-expl">{explanation && (<div className="expl-row"><span className="expl-tag">解析</span><span className="expl-text">{explanation}</span></div>)}{!explanation && details && (<><div className="expl-row"><span className="expl-tag">意思</span><span className="expl-text">{details.m}</span></div>{details.p && (<div className="expl-row"><span className="expl-tag" style={{background:'rgba(255, 146, 43, 0.1)', color:'#ff922b'}}>詞性</span><span className="expl-text" style={{fontSize:'0.9rem', color:'var(--text-sub)'}}>{details.p}</span></div>)}</>)}</div>)}</div>); })}</div><div className="result-footer"><button onClick={() => setView('quiz_setup')} className="btn btn-primary" style={{marginBottom: 12}}>再測一次</button><button onClick={() => setView('home')} className="btn btn-outline">回儀表板</button></div></div></div>); }
   
   // ✨ 單字詳細頁 + 筆記編輯器
-  if (view === 'detail' && selectedWord) { 
+ if (view === 'detail' && selectedWord) { 
+    // ... (這幾行不用動)
     const isSaved = savedWords.includes(selectedWord.w); 
     const currentIndex = filteredList.findIndex(w => w.w === selectedWord.w); 
     const hasPrev = currentIndex > 0; 
     const hasNext = currentIndex !== -1 && currentIndex < filteredList.length - 1; 
     
-    // 取得該單字的筆記
     const currentNote = customNotes[selectedWord.w] || null;
 
     return (
       <div className="app-container">
         <div className="detail-screen">
           <div className="detail-header">
-            <button onClick={() => setView('list')} className="btn-ghost">← 返回列表</button>
+            {/* ✨ 修改這裡：onClick 改成 setView(lastListView) */}
+            <button onClick={() => setView(lastListView)} className="btn-ghost">← 返回列表</button>
+            
             <button className={`btn-ghost ${isSaved ? 'active-star' : ''}`} onClick={() => toggleSave(selectedWord.w)} style={{fontSize: '1.5rem'}}>{isSaved ? '★' : '☆'}</button>
           </div>
           <div style={{flex: 1, overflowY: 'auto', paddingBottom: 100}}>
